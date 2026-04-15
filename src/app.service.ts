@@ -57,9 +57,6 @@ export class AppService {
       ),
       dbUser = this.configService.get<string>(
         OrmModuleConfigProperties.ENV_DATABASE_USER
-      ),
-      dbPwd = this.configService.get<string>(
-        OrmModuleConfigProperties.ENV_DATABASE_PASSWORD
       );
 
     return {
