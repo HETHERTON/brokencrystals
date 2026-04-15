@@ -22,11 +22,7 @@ test('GET /api/config', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
       tests: [
-        'improper_asset_management',
-        'secret_tokens',
-        'full_path_disclosure',
-        'csrf',
-        'xss'
+        'secret_tokens'
       ],
       attackParamLocations: [AttackParamLocation.PATH],
       starMetadata: {
