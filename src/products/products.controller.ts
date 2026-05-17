@@ -147,6 +147,8 @@ export class ProductsController {
   }
 
   @Get('views')
+  @UseGuards(AuthGuard)
+  @JwtType(JwtProcessorType.RSA)
   @ApiHeader({ name: 'x-product-name', example: 'Amethyst' })
   @ApiOperation({
     description: API_DESC_GET_VIEW_PRODUCT
@@ -165,8 +167,7 @@ export class ProductsController {
     @Headers('x-product-name') productName: string
   ): Promise<void> {
     try {
-      const query = `UPDATE product SET views_count = views_count + 1 WHERE name = '${productName}'`;
-      return await this.productsService.updateProduct(query);
+      return await this.productsService.updateProduct(productName);
     } catch (err) {
       throw new InternalServerErrorException({
         error: err.message,
@@ -179,8 +180,7 @@ export class ProductsController {
   async viewProductGrpc(data: {
     productName: string;
   }): Promise<{ success: boolean }> {
-    const query = `UPDATE product SET views_count = views_count + 1 WHERE name = '${data.productName}'`;
-    await this.productsService.updateProduct(query);
+    await this.productsService.updateProduct(data.productName);
     return { success: true };
   }
 }
