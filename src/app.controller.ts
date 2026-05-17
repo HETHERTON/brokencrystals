@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -205,41 +206,31 @@ export class AppController {
   ): Promise<void> {
     const numbers = Array.isArray(payload?.numbers) ? payload.numbers : [];
     const processNumbersExpression =
-      typeof payload?.processing_expression === 'string' &&
-      payload.processing_expression.trim().length > 0
-        ? payload.processing_expression
-        : 'numbers.reduce((acc, num) => acc + num, 0)';
-
-    // expose both names used by exploiter payloads
-    const response = res;
+      typeof payload?.processing_expression === 'string'
+        ? payload.processing_expression.trim()
+        : '';
 
     this.logger.debug(`Processing crystals with ${numbers.length} values`);
 
+    if (
+      processNumbersExpression !== 'numbers.reduce((acc, num) => acc + num, 0)'
+    ) {
+      throw new BadRequestException({
+        error:
+          'Unsupported processing_expression. Only numbers.reduce((acc, num) => acc + num, 0) is allowed.',
+        location: __filename
+      });
+    }
+
     try {
-      const result = eval(processNumbersExpression);
-
-      // SSJI payload may already end the response
-      if (response.sent || response.raw.writableEnded) {
-        return;
-      }
-
-      if (typeof result === 'string') {
-        response.status(200).type('text/plain').send(result);
-        return;
-      }
-
-      response
-        .status(200)
-        .type('application/json')
-        .send(JSON.stringify(result));
+      const result = numbers.reduce((acc, num) => acc + num, 0);
+      res.status(200).type('application/json').send(JSON.stringify(result));
     } catch (err: unknown) {
-      if (!response.sent && !response.raw.writableEnded) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        throw new InternalServerErrorException({
-          error: errorMessage,
-          location: __filename
-        });
-      }
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      throw new InternalServerErrorException({
+        error: errorMessage,
+        location: __filename
+      });
     }
   }
 
