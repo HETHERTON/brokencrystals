@@ -73,13 +73,12 @@ export class McpService {
   }
 
   async readResource(
-    params: McpResourceReadParams,
-    context: McpToolExecutionContext = {}
+    params: McpResourceReadParams
   ): Promise<McpResourceReadResult> {
     const { uri } = params;
 
     this.logger.debug(`Reading resource URI: ${uri}`);
 
-    return this.resourceExecutor.readResource(uri, context.authorizationHeader);
+    return this.resourceExecutor.readResource(uri);
   }
 }
