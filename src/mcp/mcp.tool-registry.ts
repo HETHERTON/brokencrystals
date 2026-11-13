@@ -34,7 +34,7 @@ export const MCP_TOOL_REGISTRY: Record<McpToolName, McpToolRegistration> = {
     definition: {
       name: 'get_count',
       description:
-        'Proxy to /api/testimonials/count. Accepts a SQL query and returns count.',
+        'Proxy to /api/testimonials/count. Returns the count of all testimonials using a supported legacy count request.',
       accessLevel: 'public',
       inputSchema: {
         type: 'object',
@@ -42,7 +42,7 @@ export const MCP_TOOL_REGISTRY: Record<McpToolName, McpToolRegistration> = {
           query: {
             type: 'string',
             description:
-              'SQL query to execute for counting. Example: select count(*) as count from testimonial'
+              'Use select count(*) as count from testimonial or select count(1) as count from testimonial. Case, whitespace and a trailing semicolon are allowed; other queries are rejected.'
           }
         },
         required: ['query']
