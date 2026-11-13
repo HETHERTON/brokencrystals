@@ -28,7 +28,7 @@ Supported methods:
 - DELETE /api/mcp: Explicitly terminate an MCP session
 
 Available tools:
-- get_count: Count testimonials using SQL query
+- get_count: Count all testimonials using a supported legacy count request
 - get_config: Get application configuration (admin only)
 - render: Sum numbers and render result (response is text/event-stream)
 - process_numbers: Process numbers via /api/process_numbers (requires numbers and processing_expression)

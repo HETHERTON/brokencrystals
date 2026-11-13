@@ -1,6 +1,6 @@
 import { EntityManager, EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Testimonial } from '../model/testimonial.entity';
 
 @Injectable()
@@ -55,13 +55,19 @@ export class TestimonialsService {
   }
 
   async count(query: string): Promise<number> {
-    try {
-      this.logger.debug(`Saved new testimonial`);
-
-      return (await this.em.getConnection().execute(query))[0].count as number;
-    } catch (err) {
-      this.logger.warn(`Failed to execute query. Error: ${err.message}`);
-      return err.message;
+    // Retain the count requests used by existing clients without executing SQL input.
+    if (
+      typeof query !== 'string' ||
+      !/^select\s+count\s*\(\s*(?:\*|1)\s*\)\s+as\s+count\s+from\s+testimonial\s*;?$/i.test(
+        query.trim()
+      )
+    ) {
+      throw new BadRequestException(
+        'Only counting all testimonials is supported'
+      );
     }
+
+    this.logger.debug('Get count of testimonials');
+    return this.testimonialsRepository.count({});
   }
 }
